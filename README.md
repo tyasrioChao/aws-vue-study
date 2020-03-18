@@ -33,6 +33,7 @@ For Neusoft Study
     * jest
 * AWS介绍
   * 账号的创建与IAM的初步设定
+  * EC2的简单介绍与创建实例
   * 快速建立各个AWS服务(CloudFormation的使用)
     * 参照[AWS CloudFormation](https://docs.aws.amazon.com/zh_cn/AWSCloudFormation/latest/UserGuide/Welcome.html)来搭建DB，Lambda,
   * 快速建立一套后端服务器接口
