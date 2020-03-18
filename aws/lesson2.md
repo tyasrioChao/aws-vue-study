@@ -68,4 +68,33 @@
 
 ### 1.2.7 审核
 
-  
+显示出你之前所选择的参数的一览，也可以在这个界面修改之前的参数。  
+当你点击启动后，会弹出一个选择密钥的窗口，选择一个之前建好的密钥或者新建一个密钥，进行下一步
+
+## 1.3 新建实例后的界面说明
+
+点击查看实例后，回到主画面，然后看到右方实例一览列表中有一个新建实例，此时点击新建实例的checkbox，下方会显示出该当实例的配置信息等情报。
+
+接下来介绍Windows的连接方式：  
+点击上方的连接按钮，有RDP(Remote Desktop Protocol)和SSM(AWS Systems Manager)两种方式，后者在讲解该服务时说明。前者根据画面提示下载桌面连接程序后，点击下方获取密码，再将1.2.7节选择的密钥填入后，即可获取密码。默认用户名是administrator
+
+Linux系统的连接方式：  
+由于大部分Linux系统并没有GUI，所以多出一种浏览器的连接方式(谷歌浏览器的扩展商店也可以搜到SSH连接插件)。默认用户名是ec2-user
+
+## 1.4 注意事项
+
+* 在项目过程中，搭建了两台EC2，安装了Apache和Tomcat服务器后发现无法通信，即使在同一个子网下也需要关闭防火墙才可以通信
+* Apache和Tomcat之前使用AJP协议，在追加了负载均衡器后需要改成http或https协议
+* 建好的EC2默认安装了AWS CLI ←需要EC2绑定角色或访问密钥才能调用别的服务
+* 在使用启用粘性会话的负载均衡器的话，response中会被设置两次[AWS-Cookie](https://forums.aws.amazon.com/thread.jspa?messageID=751842)
+* 使用负载均衡后需要在Apache的代理处，添加disablereuse属性，以提高负载均衡的利用率
+``` XML
+<IfModule proxy_http_module> 
+  <Location /mieruka/webapp> 
+    ProxyPass http://internal-DNS/mieruka/webapp disablereuse=on timeout=600 
+    ProxyPassReverse http://internal-DNS/mieruka/webapp 
+  </Location> 
+</IfModule> 
+```
+[disablereuse](https://httpd.apache.org/docs/2.4/en/mod/mod_proxy.html#proxypass)的文档  
+This parameter should be used when you want to force mod_proxy to immediately close a connection to the backend after being used, and thus, disable its persistent connection and pool for that backend. This helps in various situations where a firewall between Apache httpd and the backend server (regardless of protocol) tends to silently drop connections or when backends themselves may be under round- robin DNS. When connection reuse is enabled each backend domain is resolved (with a DNS query) only once per child process and cached for all further connections until the child is recycled. To disable connection reuse, set this property value to On
